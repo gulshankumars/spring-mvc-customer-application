@@ -1,0 +1,16 @@
+
+spring:
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/atithih_db
+    username: root
+    password: root
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      show-sql: true
+      databse: Mysql
+      database-platform: org.hibernate.dialect.MysqlDialect
+      open-in-view: false
+      generate-ddl: true
