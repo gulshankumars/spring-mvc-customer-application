@@ -2,56 +2,54 @@ package com.sunglowsys.service;
 
 import com.sunglowsys.domain.Customer;
 import com.sunglowsys.repository.CustomerRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
+@Transactional
 public class CustomerServiceImpl implements CustomerService{
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final Logger log = LoggerFactory.getLogger(CustomerServiceImpl.class);
 
+    private final CustomerRepository customerRepository;
+
+    public CustomerServiceImpl(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
+    }
 
     @Override
     public Customer createCustomer(Customer customer) {
+        log.debug("Request to create Customers : {}",customer);
         return customerRepository.save(customer);
     }
 
     @Override
-    public Customer update(Customer customer, Integer id) {
-        Customer customer1 = customerRepository.getById(id);
-        customer1.setFirstName(customer.getFirstName());
-        customer1.setLastName(customer.getLastName());
-        customer1.setEmail(customer.getEmail());
-        customer1.setMobile(customer.getMobile());
-        customer1.setGender(customer.getGender());
-        customer1.setZipcode(customer.getZipcode());
-        return customerRepository.save(customer1);
+    public Customer update(Customer customer, Long id) {
+        log.debug("Request to update Customer : {}", customer);
+        return customerRepository.save(customer);
     }
 
     @Override
-    public List<Customer> findAll() {
-        return customerRepository.findAll();
+    public Page<Customer> findAll(Pageable pageable) {
+        log.debug("Request to findAll Customers : {}", pageable.toString());
+        return customerRepository.findAll(pageable);
     }
 
     @Override
-    public Customer findById(Integer id) {
-        Optional<Customer> optional = customerRepository.findById(id);
-        Customer customer = null;
-        if (optional.isPresent()){
-            customer = optional.get();
-        }
-        else {
-            throw new RuntimeException("hotel not found for id:" +id);
-        }
-        return customer;
+    public Optional<Customer> findById(Long id) {
+        log.debug("Request to get Customer : {}", id);
+        return customerRepository.findById(id);
     }
 
     @Override
-    public void delete(Integer id) {
+    public void delete(Long id) {
+        log.debug("Request to delete Customer : {}", id);
         customerRepository.deleteById(id);
     }
 }

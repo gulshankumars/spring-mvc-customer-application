@@ -22,7 +22,8 @@ public class Customer {
         System.out.println("Customer object is created");
     }
 
-    public Customer(String firstName, String lastName, String email, String mobile, String gender, String zipcode) {
+    public Customer(Integer id, String firstName, String lastName, String email, String mobile, String gender, String zipcode) {
+        this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

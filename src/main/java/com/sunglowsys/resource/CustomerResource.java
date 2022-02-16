@@ -1,46 +1,75 @@
 package com.sunglowsys.resource;
 
 import com.sunglowsys.domain.Customer;
+import com.sunglowsys.resource.util.BadRequestException;
 import com.sunglowsys.service.CustomerService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 public class CustomerResource {
 
-    @Autowired
-    private CustomerService customerService;
+    private final Logger log = LoggerFactory.getLogger(CustomerResource.class);
+
+    private final CustomerService customerService;
+
+    public CustomerResource(CustomerService customerService) {
+        this.customerService = customerService;
+    }
 
     @PostMapping("/customers")
-    public ResponseEntity<?> create(@RequestBody Customer customer){
+    public ResponseEntity<Customer> createCustomer(@RequestBody Customer customer){
+        log.debug("REST request to create Customer : {}", customer);
+        if (customer.getId() != null){
+            throw new BadRequestException("Id should be null in create api call");
+        }
         Customer result = customerService.createCustomer(customer);
-        return ResponseEntity.ok().body("Customer is created successfully: " + result);
+        return ResponseEntity
+                .ok()
+                .body(result);
     }
 
-    @GetMapping
-    public List<Customer> getAll(){
-        List<Customer> result1 = customerService.findAll();
-        return result1;
+    @GetMapping("/customers")
+    public ResponseEntity<List<Customer>> getAllCustomers(@RequestBody Pageable pageable){
+        log.debug("REST request to getAll Customers : {}", pageable.toString());
+        Page<Customer> result = customerService.findAll(pageable);
+        return ResponseEntity
+                .ok()
+                .body(result.getContent());
     }
 
-    @GetMapping("find_customer/{id}")
-    public Customer getById(@PathVariable("id") Integer id){
-        return customerService.findById(id);
+    @GetMapping("customer/{id}")
+    public ResponseEntity<Customer> getCustomerById(@PathVariable("id") Long id){
+        log.debug("REST request to get Customer : {}",id);
+        Optional<Customer> result = customerService.findById(id);
+        return ResponseEntity
+                .ok()
+                .body(result.get());
     }
 
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> update(@RequestBody Customer customer, @PathVariable("id") Integer id){
-        customerService.update(customer, id);
-        return ResponseEntity.ok().body("Customer is updated successfully: " + id);
+    @PutMapping("/customer/{id}")
+    public ResponseEntity<?> updateCustomer(@RequestBody Customer customer, @PathVariable("id") Long id){
+        log.debug("REST request to update Customer : {}", id);
+        Customer result = customerService.update(customer,id);
+        return ResponseEntity
+                .ok()
+                .body(result);
     }
 
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<?> delete(@PathVariable("id") Integer id){
+        @DeleteMapping("/customer/{id}")
+        public ResponseEntity<Void> deleteCustomer(@PathVariable Long id){
+        log.debug("REST request to delete Customer : {}", id);
         customerService.delete(id);
-        return ResponseEntity.ok().body("Customer is successfully Deleted on this ID: " + id);
+        return ResponseEntity
+                .ok()
+                .build();
     }
 }

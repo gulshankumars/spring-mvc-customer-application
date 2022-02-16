@@ -1,4 +1,14 @@
 
+Logging:
+  level:
+    ROOT: DEBUG
+    org.hibernate.SQL: DEBUG
+    com.sunglowsys: DEBUG
+
+server:
+  port: 8082
+
+
 spring:
   datasource:
     driverClassName: com.mysql.jdbc.Driver
